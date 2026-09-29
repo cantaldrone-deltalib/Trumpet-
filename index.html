@@ -1,307 +1,583 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1724"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Trumpet Note & Doigté</title>
-<style>
-html,body{overscroll-behavior:none}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trompette Mobile</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --success: #16a34a;
+      --warning: #d97706;
+      --purple: #7c3aed;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #cbd5e1;
+    }
 
-:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#17202a;background:#eef3f7}
-*{box-sizing:border-box} body{margin:0}.app{max-width:520px;margin:auto;min-height:100vh;padding:0 12px 28px}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); padding: 12px; max-width: 600px; margin: 0 auto; }
 
-/* Bandeau noir fixe */
-header{background:#0b1724;color:white;border-radius:0 0 22px 22px;padding:18px 14px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 4px 12px #00000033}
-h1{font-size:23px;margin:0 0 4px} .sub{opacity:.82;font-size:14px}
+    h1 { text-align: center; font-size: 1.4rem; color: #1e293b; margin-bottom: 12px; }
 
-.card{background:white;border-radius:20px;padding:18px;margin-top:12px;box-shadow:0 3px 16px #00000012;transition:background 0.2s ease, border-color 0.2s ease}
-.card.in-tune{background:#eafaf1;border:2px solid #2ecc71}
-button{border:0;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer}
-#start{background:#1677ff;color:#fff;width:100%;min-height:56px;font-size:18px} #start.stop{background:#d64545}
-.row{display:flex;gap:10px;align-items:center;justify-content:space-between}
-select{padding:10px;border-radius:10px;border:1px solid #ccd4dc;font-size:15px}
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .card-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 10px; }
 
-.dial-container{position:relative;width:240px;height:240px;margin:10px auto;display:flex;align-items:center;justify-content:center}
-.dial-svg{position:absolute;top:0;left:0;width:100%;height:100%}
-.dial-center{position:relative;z-index:2;text-align:center}
+    /* Grand Affichage Note & Pistons */
+    .main-display { text-align: center; }
+    .note-name { font-size: 2.2rem; font-weight: 800; color: var(--primary); height: 45px; line-height: 45px; }
+    .valves-container { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+    .valve { width: 50px; height: 50px; border-radius: 50%; border: 3px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.3rem; background: #f8fafc; color: #94a3b8; }
+    .valve.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
+    .target-freq-display { margin-top: 10px; font-size: 0.9rem; font-weight: 700; color: #475569; }
 
-#note{font-size:48px;font-weight:900;line-height:1;color:#0b1724;margin:0}
-#note-fr{font-size:24px;font-weight:700;color:#59636d;display:block;margin-top:4px}
-#freq{text-align:center;color:#1677ff;font-size:32px;font-weight:800;font-variant-numeric:tabular-nums;margin:4px 0 2px}
-.cents{text-align:center;font-size:18px;color:#667;font-weight:700}
+    /* Micro */
+    .mic-section { text-align: center; }
+    .freq-container { display: flex; justify-content: center; align-items: baseline; gap: 6px; font-family: monospace; }
+    .freq-large { font-size: 1.8rem; font-weight: 800; color: var(--warning); }
+    .freq-target-mic { font-size: 1.1rem; font-weight: 700; color: #64748b; }
+    .mic-note { font-size: 1rem; font-weight: 600; color: #475569; margin-top: 2px; }
 
-.status{text-align:center;font-size:14px;color:#667;margin-top:8px}
-.fingering{text-align:center}.fingering h2{margin:3px 0 12px;font-size:20px}
-.valves{display:flex;justify-content:center;gap:12px;margin:12px}
-.valve{width:70px;height:86px;border:3px solid #23374d;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;background:#f7fafc}
-.valve.on{background:#23374d;color:white}
-.labels{display:flex;justify-content:center;gap:12px}.labels span{width:70px;font-size:12px;color:#667}
-.noteinfo{font-size:13px;color:#667;text-align:center;margin-top:12px}
-details summary{cursor:pointer;font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px;border-bottom:1px solid #e5e9ed;text-align:center}th{text-align:center;background:#f8fafc}
-.tip{font-size:13px;line-height:1.45;color:#59636d}@media(max-width:380px){.dial-container{width:200px;height:200px}#note{font-size:38px}.valve,.labels span{width:58px}.valve{height:76px}}
-</style>
+    /* Contrôles & Formulaires */
+    .control-group { margin-bottom: 12px; }
+    .control-group:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.85rem; font-weight: 700; color: #475569; margin-bottom: 6px; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { flex: 1; min-width: 80px; padding: 10px 6px; border: 1px solid var(--border); background: white; font-weight: 700; font-size: 0.9rem; border-radius: 8px; cursor: pointer; text-align: center; }
+    .btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    
+    .btn-mic { width: 100%; padding: 14px; font-size: 1.05rem; background: #0284c7; color: white; border: none; margin-top: 8px; }
+    .btn-mic.active { background: #dc2626; }
+
+    .btn-song { width: 100%; padding: 12px; font-size: 0.95rem; background: var(--purple); color: white; border: none; margin-top: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .btn-song.active { background: #5b21b6; }
+
+    .select-row { display: flex; align-items: center; gap: 8px; }
+    select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; font-weight: 600; background: white; }
+
+    /* Partition Tactile Mobile */
+    .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .note-card { padding: 12px 4px; border: 1px solid var(--border); background: white; border-radius: 8px; text-align: center; cursor: pointer; font-weight: 800; font-size: 1.05rem; }
+    .note-card:active { background: #e2e8f0; }
+    .note-card.playing { background: var(--success); color: white; border-color: var(--success); }
+    .note-card .sub { display: block; font-size: 0.7rem; font-weight: 500; opacity: 0.8; margin-top: 2px; }
+    .note-card .freq-tag { display: block; font-size: 0.7rem; font-weight: 600; opacity: 0.9; color: var(--warning); margin-top: 1px; }
+    .note-card.playing .freq-tag { color: white; }
+  </style>
 </head>
 <body>
-<div class="app">
-<header><h1>🎺 Trumpet Note & Doigté</h1><div class="sub">Fais vibrer l'embouchure devant le téléphone</div></header>
 
-<div class="card">
-  <div class="row"><label for="mode"><b>Partition</b></label>
-  <select id="mode"><option value="sib">Trompette en Sib (Note lue)</option><option value="concert">Note réelle / Ut</option></select></div>
-  <button id="start" style="margin-top:14px">🎙️ Démarrer le micro</button>
-  <div class="status" id="status">Micro arrêté</div>
-</div>
+  <h1>🎺 Trompette Mobile</h1>
 
-<div class="card">
-  <div class="row">
-    <label for="tuning"><b>Accord</b></label>
-    <select id="tuning"><option value="440">La = 440 Hz</option><option value="442">La = 442 Hz</option><option value="443">La = 443 Hz</option></select>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <label for="tolerance"><b>Filtre instabilité</b></label>
-    <select id="tolerance">
-      <option value="15" selected>Débutant (Très tolérant)</option>
-      <option value="10">Intermédiaire</option>
-      <option value="5">Avancé (Strict)</option>
-    </select>
-  </div>
-  <div class="row" style="margin-top:10px">
-    <label for="refreshRate"><b>Vitesse d'affichage</b></label>
-    <select id="refreshRate">
-      <option value="80">Rapide (80 ms)</option>
-      <option value="150" selected>Moyenne (150 ms)</option>
-      <option value="250">Lente (250 ms)</option>
-      <option value="400">Très lente (400 ms)</option>
-    </select>
-  </div>
-</div>
-
-<div class="card" id="tunerCard" style="text-align:center;">
-  <div class="dial-container">
-    <svg class="dial-svg" viewBox="0 0 200 200">
-      <path d="M 30 150 A 85 85 0 1 1 170 150" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"/>
-      <path d="M 90 17 A 85 85 0 0 1 110 17" fill="none" stroke="#2ecc71" stroke-width="12"/>
-      <text x="20" y="165" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="middle">♭ (Bémol)</text>
-      <text x="100" y="12" font-size="12" font-weight="bold" fill="#2ecc71" text-anchor="middle">JUSTE</text>
-      <text x="180" y="165" font-size="11" font-weight="bold" fill="#94a3b8" text-anchor="middle">♯ (Dièse)</text>
-      <circle id="marker" cx="100" cy="15" r="7" fill="#1677ff" stroke="#ffffff" stroke-width="2" style="transition: transform 0.15s ease-out; transform-origin: 100px 100px; transform: rotate(0deg);"/>
-    </svg>
-    <div class="dial-center">
-      <div id="note">—</div>
+  <!-- Affichage Note & Pistons -->
+  <div class="card main-display">
+    <div class="card-title">Note & Pistons</div>
+    <div class="note-name" id="current-note">---</div>
+    <div class="valves-container">
+      <div class="valve" id="valve-1">1</div>
+      <div class="valve" id="valve-2">2</div>
+      <div class="valve" id="valve-3">3</div>
     </div>
+    <div class="target-freq-display">Fréquence cible : <span id="current-target-freq">--- Hz</span></div>
   </div>
-  <div id="freq">0.0 Hz</div>
-  <div class="cents" id="cents">— cents</div>
-</div>
 
-<div class="card fingering">
-  <h2 id="fingerTitle">Doigté</h2>
-  <div class="valves" id="valves">
-    <div class="valve" id="v1">1</div><div class="valve" id="v2">2</div><div class="valve" id="v3">3</div>
+  <!-- Micro -->
+  <div class="card mic-section">
+    <div class="card-title">Détection Micro (Capté / Cible)</div>
+    <div class="freq-container">
+      <span class="freq-large" id="detected-freq">--- Hz</span>
+      <span class="freq-target-mic" id="mic-target-freq">/ --- Hz</span>
+    </div>
+    <div class="mic-note" id="detected-note">Micro inactif</div>
+    <button id="btn-mic" class="btn btn-mic">🎙️ Activer le Micro</button>
   </div>
-  <div class="labels"><span>piston 1</span><span>piston 2</span><span>piston 3</span></div>
-  <div class="noteinfo" id="info">Joue une note avec l’embouchure.</div><div class="noteinfo">Plage élargie : 140 Hz → 1100 Hz</div>
-</div>
 
-<div class="card">
-<details open>
-<summary>Correspondance des fréquences et doigtés (140 Hz - 1100 Hz)</summary>
-<div style="overflow-x:auto; margin-top:10px;">
-<table>
-<thead><tr><th>Partition Sib</th><th>Note réelle (Ut)</th><th>Fréquence</th><th>Doigté</th></tr></thead>
-<tbody id="table"></tbody>
-</table>
-</div>
-<p class="tip">La fréquence indiquée correspond au son réel produit (Ut). La partition affichée est en Sib (+1 ton).</p>
-</details>
-</div>
-</div>
+  <!-- Réglages -->
+  <div class="card">
+    <div class="card-title">Options de lecture</div>
 
-<script>
-let audioCtx, analyser, source, stream, raf, running=false;
-let A4=440;
-
-let buffer = [];
-const BUFFER_SIZE = 15;
-let lastDisplayTime = 0;
-
-const namesInt = ["C","C♯","D","E♭","E","F","F♯","G","A♭","A","B♭","B"];
-const namesFr  = ["Do","Do♯","Ré","Mi♭","Mi","Fa","Fa♯","Sol","La♭","La","Si♭","Si"];
-
-const fingering = {
- "C":[], "C♯":[1,2,3], "D":[1,3], "E♭":[2,3], "E":[1,2], "F":[1],
- "F♯":[2], "G":[], "A♭":[2,3], "A":[1,2], "B♭":[1], "B":[2]
-};
-
-const tuningEl=document.getElementById("tuning"), modeEl=document.getElementById("mode"), 
-      toleranceEl=document.getElementById("tolerance"), refreshRateEl=document.getElementById("refreshRate"), 
-      start=document.getElementById("start");
-const noteEl=document.getElementById("note"), freqEl=document.getElementById("freq"),
-      centsEl=document.getElementById("cents"), statusEl=document.getElementById("status"),
-      infoEl=document.getElementById("info"), tunerCard=document.getElementById("tunerCard"),
-      marker=document.getElementById("marker");
-
-function midiFreq(m){return A4*Math.pow(2,(m-69)/12)}
-
-function getNoteNames(m) {
-  const index = ((m % 12) + 12) % 12;
-  const octave = Math.floor(m / 12) - 1;
-  const octaveFr = octave - 1;
-  return {
-    int: namesInt[index] + octave,
-    fr: namesFr[index] + (octaveFr >= 0 ? octaveFr : ""),
-    raw: namesInt[index]
-  };
-}
-
-function nearestMidi(f){return Math.round(69+12*Math.log2(f/A4))}
-
-function detectPitchInstant(buf,sr){
-  let size=buf.length, rms=0;
-  for(let i=0;i<size;i++) rms+=buf[i]*buf[i];
-  rms=Math.sqrt(rms/size);
-  if(rms<0.008) return null;
-  
-  let bestLag=-1,best=-1;
-  // Plage élargie de 140 Hz à 1100 Hz
-  const minLag=Math.floor(sr/1100), maxLag=Math.floor(sr/140);
-  for(let lag=minLag;lag<=maxLag;lag++){
-    let sum=0;
-    for(let i=0;i<size-lag;i++) sum+=buf[i]*buf[i+lag];
-    sum/=size-lag;
-    if(sum>best){best=sum;bestLag=lag}
-  }
-  if(bestLag<0 || best<0.002) return null;
-  let lag=bestLag;
-  if(lag>minLag && lag<maxLag){
-    const corr=(L)=>{let s=0;for(let i=0;i<size-L;i++)s+=buf[i]*buf[i+L];return s/(size-L)}
-    const a=corr(lag-1),b=corr(lag),c=corr(lag+1);
-    const den=2*(a-2*b+c); if(den) lag+=(a-c)/den;
-  }
-  
-  const freq = sr/lag;
-  if(freq < 140 || freq > 1100) return null;
-  return freq;
-}
-
-function getPlausibleBrassFrequency(rawFreq) {
-  buffer.push(rawFreq);
-  if (buffer.length > BUFFER_SIZE) buffer.shift();
-
-  if (buffer.length < 3) return rawFreq;
-
-  const sorted = [...buffer].sort((a, b) => a - b);
-  const median = sorted[Math.floor(sorted.length / 2)];
-  const validSamples = buffer.filter(f => Math.abs(1200 * Math.log2(f / median)) < 120);
-
-  if (validSamples.length === 0) return median;
-
-  return validSamples.reduce((sum, val) => sum + val, 0) / validSamples.length;
-}
-
-function display(freq){
-  const now = performance.now();
-  const refreshInterval = parseInt(refreshRateEl.value);
-  
-  if (now - lastDisplayTime < refreshInterval && lastDisplayTime !== 0) return;
-  lastDisplayTime = now;
-
-  let realMidi = nearestMidi(freq);
-  let writtenMidi = (modeEl.value === "sib") ? realMidi + 2 : realMidi;
-  
-  const noteInfo = getNoteNames(writtenMidi);
-  const targetRealFreq = midiFreq(realMidi);
-  const cents = 1200 * Math.log2(freq / targetRealFreq);
-  
-  const ok = writtenMidi >= 57 && writtenMidi <= 88;
-  
-  noteEl.innerHTML = ok 
-    ? `${noteInfo.int} <span id="note-fr">${noteInfo.fr}</span>` 
-    : `${noteInfo.raw} <span id="note-fr">${namesFr[namesInt.indexOf(noteInfo.raw)]}</span>`;
+    <div class="control-group">
+      <label>Tonalité de l'instrument :</label>
+      <div class="btn-row">
+        <button id="btn-key-c" class="btn active">Ut (Piano)</button>
+        <button id="btn-key-bb" class="btn">Si♭ (Trompette)</button>
+      </div>
+    </div>
     
-  freqEl.textContent = freq.toFixed(1) + " Hz";
-  centsEl.textContent = (cents >= 0 ? "+" : "") + cents.toFixed(0) + " cents";
+    <div class="control-group">
+      <label>Filtres d'altérations :</label>
+      <div class="btn-row">
+        <button id="btn-naturals" class="btn active">Naturelles</button>
+        <button id="btn-sharps" class="btn">Dièses (#)</button>
+        <button id="btn-flats" class="btn">Bémols (b)</button>
+      </div>
+    </div>
 
-  const angle = Math.max(-120, Math.min(120, (cents / 50) * 120));
-  marker.style.transform = `rotate(${angle}deg)`;
+    <div class="control-group">
+      <label>Plage de notes :</label>
+      <div class="select-row">
+        <select id="select-start"></select>
+        <span>à</span>
+        <select id="select-end"></select>
+      </div>
+    </div>
 
-  const tol = parseInt(toleranceEl.value);
-  if(Math.abs(cents) <= tol) {
-    tunerCard.classList.add("in-tune");
-    marker.setAttribute("fill", "#2ecc71");
-  } else {
-    tunerCard.classList.remove("in-tune");
-    marker.setAttribute("fill", "#1677ff");
-  }
+    <div class="control-group">
+      <label for="duration">Durée des notes :</label>
+      <select id="duration"></select>
+    </div>
 
-  const fs = fingering[noteInfo.raw] || [];
-  ["v1","v2","v3"].forEach((id,i) => document.getElementById(id).classList.toggle("on", fs.includes(i+1)));
-  
-  document.getElementById("fingerTitle").textContent = ok 
-    ? `Doigté pour ${noteInfo.int} (${noteInfo.fr})` 
-    : "Hors plage";
-    
-  infoEl.textContent = ok 
-    ? (fs.length ? "Pistons : " + fs.join(" + ") : " Aucun piston (0)") 
-    : "Note hors plage usuelle.";
-}
+    <div class="control-group">
+      <label for="repeat-count">Répétitions par note :</label>
+      <select id="repeat-count"></select>
+    </div>
 
-function loop(){
-  if(!running) return;
-  const buf = new Float32Array(analyser.fftSize);
-  analyser.getFloatTimeDomainData(buf);
-  const rawF = detectPitchInstant(buf, audioCtx.sampleRate);
-  
-  if(rawF){
-    const cleanF = getPlausibleBrassFrequency(rawF);
-    display(cleanF);
-  } else {
-    if (buffer.length > 0) buffer = [];
-  }
-  raf = requestAnimationFrame(loop);
-}
+    <div class="btn-row" style="margin-top: 10px;">
+      <button id="btn-loop" class="btn">🔁 Continu</button>
+      <button id="btn-random" class="btn">🔀 Aléatoire</button>
+    </div>
 
-async function toggle(){
- if(running){
-   running=false; cancelAnimationFrame(raf); stream.getTracks().forEach(t=>t.stop());
-   start.textContent="🎙️ Démarrer le micro"; start.classList.remove("stop"); statusEl.textContent="Micro arrêté"; return;
- }
- try{
-   stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-   audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-   source=audioCtx.createMediaStreamSource(stream);
-   analyser=audioCtx.createAnalyser(); analyser.fftSize=2048;
-   source.connect(analyser); running=true; start.textContent="⏹ Arrêter"; start.classList.add("stop"); statusEl.textContent="Écoute en cours…"; loop();
- }catch(e){statusEl.textContent="Accès au micro refusé ou indisponible."; console.error(e)}
-}
+    <button id="btn-song" class="btn-song">🎵 Jouer l'exemple (L'ourson et le miel)</button>
+  </div>
 
-function renderTable() {
-  let html = "";
-  // Génère la table de 140 Hz à 1050 Hz (MIDI 53 à 86)
-  for (let m = 53; m <= 86; m++) {
-    let f = midiFreq(m);
-    let sibInfo = getNoteNames(m + 2);
-    let realInfo = getNoteNames(m);
-    let fg = fingering[sibInfo.raw] ? (fingering[sibInfo.raw].length ? fingering[sibInfo.raw].join("+") : "0") : "—";
-    html += `<tr>
-      <td><b>${sibInfo.int}</b> (${sibInfo.fr})</td>
-      <td>${realInfo.int} (${realInfo.fr})</td>
-      <td>${f.toFixed(1)} Hz</td>
-      <td><b>${fg}</b></td>
-    </tr>`;
-  }
-  document.getElementById("table").innerHTML = html;
-}
+  <!-- Partition Tactile -->
+  <div class="card">
+    <div class="card-title">Notes à jouer</div>
+    <div class="notes-grid" id="notes-container"></div>
+  </div>
 
-start.onclick=toggle;
-modeEl.onchange=()=>{ buffer=[]; lastDisplayTime=0; };
-tuningEl.onchange=()=>{ A4=parseFloat(tuningEl.value); renderTable(); buffer=[]; lastDisplayTime=0; };
-toleranceEl.onchange=()=>{ buffer=[]; lastDisplayTime=0; };
-refreshRateEl.onchange=()=>{ lastDisplayTime=0; };
+  <script>
+    // Gamme chromatique fondamentale avec fréquences réelles (Ut)
+    const baseScale = [
+      { note: "E3",  name: "Mi 3",  freq: 164.81, valves: [1, 2, 0], type: "natural" },
+      { note: "F3",  name: "Fa 3",  freq: 174.61, valves: [1, 0, 3], type: "natural" },
+      { note: "F#3", name: "Fa# 3", freq: 185.00, valves: [0, 2, 3], type: "sharp" },
+      { note: "Gb3", name: "Solb 3",freq: 185.00, valves: [0, 2, 3], type: "flat" },
+      { note: "G3",  name: "Sol 3", freq: 196.00, valves: [0, 0, 0], type: "natural" },
+      { note: "G#3", name: "Sol# 3",freq: 207.65, valves: [0, 2, 3], type: "sharp" },
+      { note: "Ab3", name: "Lab 3", freq: 207.65, valves: [0, 2, 3], type: "flat" },
+      { note: "A3",  name: "La 3",  freq: 220.00, valves: [1, 2, 0], type: "natural" },
+      { note: "A#3", name: "La# 3", freq: 233.08, valves: [1, 0, 0], type: "sharp" },
+      { note: "Bb3", name: "Sib 3", freq: 233.08, valves: [1, 0, 0], type: "flat" },
+      { note: "B3",  name: "Si 3",  freq: 246.94, valves: [0, 2, 0], type: "natural" },
+      { note: "C4",  name: "Do 4",  freq: 261.63, valves: [0, 0, 0], type: "natural" },
+      { note: "C#4", name: "Do# 4", freq: 277.18, valves: [1, 2, 3], type: "sharp" },
+      { note: "Db4", name: "Réb 4", freq: 277.18, valves: [1, 2, 3], type: "flat" },
+      { note: "D4",  name: "Ré 4",  freq: 293.66, valves: [1, 0, 3], type: "natural" },
+      { note: "D#4", name: "Ré# 4", freq: 311.13, valves: [0, 2, 3], type: "sharp" },
+      { note: "Eb4", name: "Mib 4", freq: 311.13, valves: [0, 2, 3], type: "flat" },
+      { note: "E4",  name: "Mi 4",  freq: 329.63, valves: [1, 2, 0], type: "natural" },
+      { note: "F4",  name: "Fa 4",  freq: 349.23, valves: [1, 0, 0], type: "natural" },
+      { note: "F#4", name: "Fa# 4", freq: 369.99, valves: [0, 2, 0], type: "sharp" },
+      { note: "Gb4", name: "Solb 4",freq: 369.99, valves: [0, 2, 0], type: "flat" },
+      { note: "G4",  name: "Sol 4", freq: 392.00, valves: [0, 0, 0], type: "natural" },
+      { note: "G#4", name: "Sol# 4",freq: 415.30, valves: [0, 2, 3], type: "sharp" },
+      { note: "Ab4", name: "Lab 4", freq: 415.30, valves: [0, 2, 3], type: "flat" },
+      { note: "A4",  name: "La 4",  freq: 440.00, valves: [1, 2, 0], type: "natural" },
+      { note: "A#4", name: "La# 4", freq: 466.16, valves: [1, 0, 0], type: "sharp" },
+      { note: "Bb4", name: "Sib 4", freq: 466.16, valves: [1, 0, 0], type: "flat" },
+      { note: "B4",  name: "Si 4",  freq: 493.88, valves: [0, 2, 0], type: "natural" },
+      { note: "C5",  name: "Do 5",  freq: 523.25, valves: [0, 0, 0], type: "natural" },
+      { note: "C#5", name: "Do# 5", freq: 554.37, valves: [1, 2, 0], type: "sharp" },
+      { note: "Db5", name: "Réb 5", freq: 554.37, valves: [1, 2, 0], type: "flat" },
+      { note: "D5",  name: "Ré 5",  freq: 587.33, valves: [1, 0, 0], type: "natural" },
+      { note: "D#5", name: "Ré# 5", freq: 622.25, valves: [0, 2, 0], type: "sharp" },
+      { note: "Eb5", name: "Mib 5", freq: 622.25, valves: [0, 2, 0], type: "flat" },
+      { note: "E5",  name: "Mi 5",  freq: 659.25, valves: [0, 0, 0], type: "natural" },
+      { note: "F5",  name: "Fa 5",  freq: 698.46, valves: [1, 0, 0], type: "natural" },
+      { note: "F#5", name: "Fa# 5", freq: 739.99, valves: [0, 2, 0], type: "sharp" },
+      { note: "Gb5", name: "Solb 5",freq: 739.99, valves: [0, 2, 0], type: "flat" },
+      { note: "G5",  name: "Sol 5", freq: 783.99, valves: [0, 0, 0], type: "natural" },
+      { note: "G#5", name: "Sol# 5",freq: 830.61, valves: [0, 2, 3], type: "sharp" },
+      { note: "Ab5", name: "Lab 5", freq: 830.61, valves: [0, 2, 3], type: "flat" },
+      { note: "A5",  name: "La 5",  freq: 880.00, valves: [1, 2, 0], type: "natural" },
+      { note: "A#5", name: "La# 5", freq: 932.33, valves: [1, 0, 0], type: "sharp" },
+      { note: "Bb5", name: "Sib 5", freq: 932.33, valves: [1, 0, 0], type: "flat" },
+      { note: "B5",  name: "Si 5",  freq: 987.77, valves: [0, 2, 0], type: "natural" },
+      { note: "C6",  name: "Do 6",  freq: 1046.50, valves: [0, 0, 0], type: "natural" }
+    ];
 
-renderTable();
-</script>
+    // Partition d'exemple : "L'ourson et le miel"
+    const songNotesKeys = [
+      "G4", "G4", "G4", "C5", 
+      "E4", "E4", "E4", "G4", 
+      "C4", "C4", "C4", "E4", "G4" , "D4" ,
+      "A4", "F4", "F4", "F4", "G4", "E4", "E4", "E4" ,
+      "F4", "D4", "D4", "D4","C4", "E4", "G4", "G4", "G4", "G4", "G4" ,
+      "A4", "A4", "A4", "G4", "G4", "G4", "G4","G4", "G4" , "C4" 
+    ];
+
+    let currentKey = "C";
+    let notesData = [];
+    let filters = { natural: true, sharp: false, flat: false };
+    let isLooping = false;
+    let isRandom = false;
+    let isSongPlaying = false;
+    let loopTimeout = null;
+    let currentIdx = 0;
+    let currentRepeatCount = 0;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let micStream = null;
+    let analyser = null;
+
+    function initSelects() {
+      const durationSelect = document.getElementById('duration');
+      for (let i = 1; i <= 15; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + " seconde" + (i > 1 ? "s" : "");
+        durationSelect.appendChild(option);
+      }
+
+      const repeatSelect = document.getElementById('repeat-count');
+      for (let i = 1; i <= 10; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i + " fois";
+        repeatSelect.appendChild(option);
+      }
+    }
+
+    function updateScaleForTranspose() {
+      notesData = baseScale.map(item => {
+        if (currentKey === "C") {
+          return { ...item };
+        } else {
+          return {
+            ...item,
+            freq: item.freq * Math.pow(2, -2 / 12)
+          };
+        }
+      });
+    }
+
+    function updateValvesDisplay(valvesArray) {
+      document.getElementById('valve-1').classList.toggle('active', valvesArray[0] === 1);
+      document.getElementById('valve-2').classList.toggle('active', valvesArray[1] === 2);
+      document.getElementById('valve-3').classList.toggle('active', valvesArray[2] === 3);
+    }
+
+    function playNote(item) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const duration = parseFloat(document.getElementById('duration').value);
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(item.freq, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+
+      const freqText = item.freq.toFixed(1) + " Hz";
+      document.getElementById('current-note').innerText = item.name;
+      document.getElementById('current-target-freq').innerText = freqText;
+      document.getElementById('mic-target-freq').innerText = "/ " + freqText;
+
+      updateValvesDisplay(item.valves);
+      highlightBtn(item.note);
+    }
+
+    function highlightBtn(noteKey) {
+      document.querySelectorAll('.note-card').forEach(btn => {
+        btn.classList.toggle('playing', btn.dataset.note === noteKey);
+      });
+    }
+
+    function getVisibleNotes() {
+      return notesData.filter(item => filters[item.type]);
+    }
+
+    function getFilteredRangeNotes() {
+      const visible = getVisibleNotes();
+      const startNote = document.getElementById('select-start').value;
+      const endNote = document.getElementById('select-end').value;
+
+      let startIdx = visible.findIndex(n => n.note === startNote);
+      let endIdx = visible.findIndex(n => n.note === endNote);
+
+      if (startIdx === -1) startIdx = 0;
+      if (endIdx === -1) endIdx = visible.length - 1;
+
+      if (startIdx > endIdx) [startIdx, endIdx] = [endIdx, startIdx];
+
+      return visible.slice(startIdx, endIdx + 1);
+    }
+
+    function runLoop() {
+      const maxRepeats = parseInt(document.getElementById('repeat-count').value, 10);
+      const duration = parseFloat(document.getElementById('duration').value);
+
+      if (isSongPlaying) {
+        let songSequence = songNotesKeys
+          .map(k => notesData.find(n => n.note === k))
+          .filter(n => n);
+
+        if (songSequence.length === 0 || currentIdx >= songSequence.length) {
+          stopLoop();
+          return;
+        }
+
+        const item = songSequence[currentIdx];
+        playNote(item);
+        currentRepeatCount++;
+
+        if (currentRepeatCount >= maxRepeats) {
+          currentRepeatCount = 0;
+          currentIdx++;
+        }
+
+        loopTimeout = setTimeout(runLoop, duration * 1000);
+        return;
+      }
+
+      if (!isLooping) return;
+      let notes = getFilteredRangeNotes();
+      if (notes.length === 0) return;
+
+      if (currentIdx >= notes.length) {
+        currentIdx = 0;
+      }
+
+      const item = notes[currentIdx];
+      playNote(item);
+      currentRepeatCount++;
+
+      if (currentRepeatCount >= maxRepeats) {
+        currentRepeatCount = 0;
+        if (isRandom) {
+          currentIdx = Math.floor(Math.random() * notes.length);
+        } else {
+          currentIdx++;
+        }
+      }
+
+      loopTimeout = setTimeout(runLoop, duration * 1000);
+    }
+
+    function stopLoop() {
+      isLooping = false;
+      isSongPlaying = false;
+      currentRepeatCount = 0;
+      if (loopTimeout) clearTimeout(loopTimeout);
+      document.getElementById('btn-loop').classList.remove('active');
+      document.getElementById('btn-random').classList.remove('active');
+      document.getElementById('btn-song').classList.remove('active');
+      document.querySelectorAll('.note-card').forEach(b => b.classList.remove('playing'));
+    }
+
+    function updateSelects() {
+      const startSel = document.getElementById('select-start');
+      const endSel = document.getElementById('select-end');
+      const oldStart = startSel.value;
+      const oldEnd = endSel.value;
+
+      startSel.innerHTML = '';
+      endSel.innerHTML = '';
+
+      const notes = getVisibleNotes();
+      notes.forEach(item => {
+        startSel.add(new Option(item.name, item.note));
+        endSel.add(new Option(item.name, item.note));
+      });
+
+      if (notes.some(n => n.note === oldStart)) startSel.value = oldStart;
+      if (notes.some(n => n.note === oldEnd)) endSel.value = oldEnd;
+      else if (notes.length > 0) endSel.value = notes[notes.length - 1].note;
+    }
+
+    function renderButtons() {
+      updateScaleForTranspose();
+      const container = document.getElementById('notes-container');
+      container.innerHTML = '';
+
+      const visible = getVisibleNotes();
+      visible.forEach(item => {
+        const btn = document.createElement('div');
+        btn.className = 'note-card';
+        btn.dataset.note = item.note;
+        btn.innerHTML = `${item.name}<span class="sub">${item.note}</span><span class="freq-tag">${item.freq.toFixed(1)} Hz</span>`;
+        btn.onclick = () => {
+          stopLoop();
+          playNote(item);
+        };
+        container.appendChild(btn);
+      });
+
+      updateSelects();
+    }
+
+    // Gestion Micro
+    document.getElementById('btn-mic').onclick = async (e) => {
+      const btn = e.currentTarget;
+      if (micStream) {
+        micStream.getTracks().forEach(track => track.stop());
+        micStream = null;
+        btn.classList.remove('active');
+        btn.innerText = "🎙️ Activer le Micro";
+        document.getElementById('detected-freq').innerText = "--- Hz";
+        document.getElementById('detected-note').innerText = "Micro inactif";
+        return;
+      }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const source = audioCtx.createMediaStreamSource(micStream);
+
+        const highPass = audioCtx.createBiquadFilter();
+        highPass.type = 'highpass';
+        highPass.frequency.value = 140;
+
+        const lowPass = audioCtx.createBiquadFilter();
+        lowPass.type = 'lowpass';
+        lowPass.frequency.value = 1200;
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+
+        source.connect(highPass);
+        highPass.connect(lowPass);
+        lowPass.connect(analyser);
+
+        btn.classList.add('active');
+        btn.innerText = "⏹️ Arrêter Micro";
+        detectPitch();
+      } catch (err) {
+        alert("Accès micro impossible : " + err);
+      }
+    };
+
+    function detectPitch() {
+      if (!micStream) return;
+      const buf = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(buf);
+
+      let bestOffset = -1;
+      let bestCorrelation = 0;
+      let rms = 0;
+
+      for (let i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / buf.length);
+
+      if (rms > 0.015) {
+        for (let offset = 20; offset < 1000; offset++) {
+          let correlation = 0;
+          for (let i = 0; i < buf.length - offset; i++) {
+            correlation += buf[i] * buf[i + offset];
+          }
+          if (correlation > bestCorrelation) {
+            bestCorrelation = correlation;
+            bestOffset = offset;
+          }
+        }
+        if (bestOffset !== -1) {
+          const freq = audioCtx.sampleRate / bestOffset;
+
+          if (freq >= 140 && freq <= 1100) {
+            document.getElementById('detected-freq').innerText = freq.toFixed(1) + " Hz";
+
+            let closest = notesData.reduce((prev, curr) => 
+              Math.abs(curr.freq - freq) < Math.abs(prev.freq - freq) ? curr : prev
+            );
+            document.getElementById('detected-note').innerText = closest.name + " (" + closest.note + ")";
+          }
+        }
+      }
+      requestAnimationFrame(detectPitch);
+    }
+
+    // Gestion de la tonalité
+    document.getElementById('btn-key-c').onclick = (e) => {
+      currentKey = "C";
+      document.getElementById('btn-key-c').classList.add('active');
+      document.getElementById('btn-key-bb').classList.remove('active');
+      renderButtons();
+    };
+
+    document.getElementById('btn-key-bb').onclick = (e) => {
+      currentKey = "Bb";
+      document.getElementById('btn-key-bb').classList.add('active');
+      document.getElementById('btn-key-c').classList.remove('active');
+      renderButtons();
+    };
+
+    // Gestion des filtres
+    document.getElementById('btn-naturals').onclick = (e) => {
+      filters.natural = !filters.natural;
+      e.currentTarget.classList.toggle('active', filters.natural);
+      renderButtons();
+    };
+
+    document.getElementById('btn-sharps').onclick = (e) => {
+      filters.sharp = !filters.sharp;
+      e.currentTarget.classList.toggle('active', filters.sharp);
+      renderButtons();
+    };
+
+    document.getElementById('btn-flats').onclick = (e) => {
+      filters.flat = !filters.flat;
+      e.currentTarget.classList.toggle('active', filters.flat);
+      renderButtons();
+    };
+
+    // Boutons de lecture
+    document.getElementById('btn-loop').onclick = () => {
+      if (isLooping && !isRandom) {
+        stopLoop();
+      } else {
+        stopLoop();
+        isLooping = true;
+        isRandom = false;
+        currentIdx = 0;
+        currentRepeatCount = 0;
+        document.getElementById('btn-loop').classList.add('active');
+        runLoop();
+      }
+    };
+
+    document.getElementById('btn-random').onclick = () => {
+      if (isLooping && isRandom) {
+        stopLoop();
+      } else {
+        stopLoop();
+        isLooping = true;
+        isRandom = true;
+        currentIdx = 0;
+        currentRepeatCount = 0;
+        document.getElementById('btn-random').classList.add('active');
+        runLoop();
+      }
+    };
+
+    document.getElementById('btn-song').onclick = () => {
+      if (isSongPlaying) {
+        stopLoop();
+      } else {
+        stopLoop();
+        isSongPlaying = true;
+        currentIdx = 0;
+        currentRepeatCount = 0;
+        document.getElementById('btn-song').classList.add('active');
+        runLoop();
+      }
+    };
+
+    // Initialisation
+    initSelects();
+    renderButtons();
+  </script>
 </body>
 </html>
